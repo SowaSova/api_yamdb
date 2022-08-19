@@ -1,6 +1,7 @@
 from rest_framework import serializers
+from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review, Comment
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 
@@ -45,3 +46,29 @@ class TitleSerializer(serializers.ModelSerializer):
         if value > timezone.now().year:
             raise ValidationError(
                 'Год выхода произведения еще не наступил!')
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field="username", read_only="True")
+
+    def create(self, validated_data):
+        rating = Review.objects.update_or_create(
+            author=validated_data.get("author", None),
+            movie=validated_data.get("movie", None),
+            defaults={"score": validated_data.get("score")},
+        )
+        return rating
+
+    class Meta:
+        fields = "__all__"
+        model = Review
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field="username", read_only="True")
+
+    class Meta:
+        fields = "__all__"
+        model = Comment
+
+
+
