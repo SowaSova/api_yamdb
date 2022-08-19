@@ -12,11 +12,12 @@ class CustomUser(AbstractBaseUser):
 
     email = models.EmailField(max_length=254, unique=True)
     username = models.CharField(max_length=150, unique=True)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    bio = models.TextField()
+    first_name = models.CharField(max_length=150, blank=True)
+    last_name = models.CharField(max_length=150, blank=True)
+    bio = models.TextField(blank=True)
     role = models.CharField(max_length=10, choices=ROLE_OPTIONS, default=1)
-    confirmed = models.BooleanField(default=False)
+    is_confirmed = models.BooleanField(default=False)
+    confirmation_code = models.CharField(max_length=64)
 
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
