@@ -5,7 +5,6 @@ from reviews.models import Category, Genre, Title, Review, Comment
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
 
-
 User = get_user_model()
 
 
@@ -47,6 +46,7 @@ class TitleSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 'Год выхода произведения еще не наступил!')
 
+
 class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field="username", read_only="True")
 
@@ -69,6 +69,3 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = "__all__"
         model = Comment
-
-
-

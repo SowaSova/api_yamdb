@@ -1,18 +1,15 @@
 from django.shortcuts import render, get_object_or_404, HttpResponse
 from reviews.models import Review, Comment, Category, Genre, Title
 from rest_framework import filters, mixins, pagination, viewsets
-from .serializers import (CommentSerializer, ReviewSerializer, 
-CategorySerializer, GenreSerializer, 
-TitleSerializer)
-from .permissions import StaffOrAuthorOrReadOnly
+from .serializers import (
+    CommentSerializer, ReviewSerializer,
+    CategorySerializer, GenreSerializer,
+    TitleSerializer
+)
+from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
 
-
-from rest_framework.permissions import (
-    AllowAny,
-    IsAuthenticated,
-    IsAuthenticatedOrReadOnly,
-)
+from rest_framework.permissions import IsAuthenticatedOrReadOnly
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -34,8 +31,8 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class ListCreateDestroyViewSet(
     mixins.ListModelMixin, mixins.CreateModelMixin,
-        mixins.DestroyModelMixin, viewsets.GenericViewSet):
-
+    mixins.DestroyModelMixin, viewsets.GenericViewSet
+):
     pass
 
 
