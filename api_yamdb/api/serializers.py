@@ -33,18 +33,19 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
-    category = CategorySerializer()
+    genre = SlugRelatedField(slug_field='slug', queryset=Genre.objects.all(), many=True)
+    category = SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
 
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
-    def validate(self, value):
+    def validate_year(self, value):
         if value > timezone.now().year:
             raise ValidationError(
                 'Год выхода произведения еще не наступил!')
+        return value
 
 
 class ReviewSerializer(serializers.ModelSerializer):
