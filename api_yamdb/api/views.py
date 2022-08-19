@@ -4,8 +4,11 @@ from rest_framework import filters, mixins, pagination, viewsets
 from .serializers import CommentSerializer, ReviewSerializer
 from .permissions import StaffOrAuthorOrReadOnly
 
-from rest_framework.permissions import (AllowAny, IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    AllowAny,
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly,
+)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
