@@ -35,6 +35,7 @@ class GenreSerializer(serializers.ModelSerializer):
 class TitleSerializer(serializers.ModelSerializer):
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
+    rating = serializers.SerializerMethodField()
 
     class Meta:
         model = Title
@@ -46,17 +47,12 @@ class TitleSerializer(serializers.ModelSerializer):
             raise ValidationError(
                 'Год выхода произведения еще не наступил!')
 
+    def get_rating(self, obj):
+        return obj.rating
+
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field="username", read_only="True")
-
-    def create(self, validated_data):
-        rating = Review.objects.update_or_create(
-            author=validated_data.get("author", None),
-            movie=validated_data.get("movie", None),
-            defaults={"score": validated_data.get("score")},
-        )
-        return rating
 
     class Meta:
         fields = "__all__"
