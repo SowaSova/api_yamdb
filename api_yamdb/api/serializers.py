@@ -102,10 +102,10 @@ class AdminSerializer(serializers.ModelSerializer):
 
 class SignupSerializer(serializers.ModelSerializer):
     username = serializers.CharField(required=True)
-    confirmation_code = serializers.CharField(required=True)
+
     class Meta:
         model = User
-        fields = ('username', 'email',)
+        fields = ('username', 'email')
 
 
 class TokenSerializer(serializers.ModelSerializer):

@@ -30,6 +30,7 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default=USER,
     )
+    confirmation_code = models.CharField(max_length=30)
 
     def __str__(self):
         return self.username
