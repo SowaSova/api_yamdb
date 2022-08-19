@@ -5,11 +5,16 @@ charset-normalizer==2.0.12
 Django==2.2.16
 django-filter==2.4.0
 djangorestframework==3.12.4
+djangorestframework-simplejwt==5.2.0
+flake8==5.0.4
 idna==3.3
 iniconfig==1.1.1
+mccabe==0.7.0
 packaging==21.3
 pluggy==0.13.1
 py==1.11.0
+pycodestyle==2.9.1
+pyflakes==2.5.0
 PyJWT==2.1.0
 pyparsing==3.0.9
 pytest==6.2.4

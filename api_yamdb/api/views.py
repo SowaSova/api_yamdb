@@ -4,7 +4,7 @@ from rest_framework import filters, mixins, pagination, viewsets
 from .serializers import (
     CommentSerializer, ReviewSerializer,
     CategorySerializer, GenreSerializer,
-    TitleSerializer, SignupSerializer, TokenSerializer
+    TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer
 )
 from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly
 from django_filters.rest_framework import DjangoFilterBackend
@@ -145,3 +145,8 @@ def get_token(request):
             return Response({'access': str(refresh.access_token)})
 
     return Response(serializer.errors)
+
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
