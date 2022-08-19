@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import AbstractUser
+from .validators import validate_username
 
 User = get_user_model()
 
@@ -59,3 +61,32 @@ class Comment(models.Model):
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
     pub_date = models.DateTimeField("Дата добавления", auto_now_add=True, db_index=True)
+
+
+USER = 'user'
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+
+ROLE_CHOICES = [
+    (USER, USER),
+    (ADMIN, ADMIN),
+    (MODERATOR, MODERATOR),
+]
+
+
+class User(AbstractUser):
+    username = models.CharField(
+        validators=(validate_username,), max_length=200, unique=True
+    )
+    email = models.EmailField(max_length=254, unique=True)
+    first_name = models.CharField(max_length=200, blank=True)
+    last_name = models.CharField(max_length=200, blank=True)
+    bio = models.TextField(blank=True)
+    role = models.CharField(
+        max_length=10,
+        choices=ROLE_CHOICES,
+        default=USER,
+    )
+
+    def __str__(self):
+        return self.username
