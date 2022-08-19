@@ -1,5 +1,8 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class Genre(models.Model):
@@ -38,7 +41,7 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    title = models.ForeignKey(Movie, on_delete=models.CASCADE, related_name="reviews")
+    title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name="reviews")
     text = models.TextField()
     author = models.ForeignKey(
         User,
