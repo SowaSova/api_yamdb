@@ -108,17 +108,21 @@ class TitlesViewSet(viewsets.ModelViewSet):
     permission_classes = (AdminOrReadOnly,)
 
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category', 'genre', 'name', 'year')
+    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
             return TitleDisplaySerializer
-        return TitleSerializer
+        return super().get_serializer_class()
 
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
+    """
+    Принимает почту и юзернейм, в ответ отправляет
+    код подтверждения.
+    """
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = User.objects.create(
@@ -145,6 +149,10 @@ def signup(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def get_token(request):
+    """
+    Принимает код подтверждения, сравнивает его с хешем.
+    В ответ отправляет токен.
+    """
     serializer = TokenSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         username = serializer.data['username']
@@ -159,6 +167,11 @@ def get_token(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    Админ может получить список пользователей, добаввить
+    одного. Получить, изменить его данные. Удалить его.
+    Сам пользователь может получить и изменить свои данные.
+    """
     queryset = User.objects.all()
     serializer_class = AdminSerializer
     permission_classes = (IsAdmin,)
