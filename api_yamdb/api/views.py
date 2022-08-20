@@ -5,12 +5,12 @@ from .serializers import (
     CommentSerializer, ReviewSerializer,
     CategorySerializer, GenreSerializer,
     TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer,
-    TitleDisplaySerializer
+    TitleDisplaySerializer, AdminSerializer
 )
-from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly, AuthorOrAdmin
+from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly, IsAdmin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, action
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -158,8 +158,8 @@ def get_token(request):
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = (AuthorOrAdmin,)
+    serializer_class = AdminSerializer
+    permission_classes = (IsAdmin,)
     lookup_field = 'username'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('username',)
@@ -167,6 +167,7 @@ class UserViewSet(viewsets.ModelViewSet):
     @action(
         detail=False, methods=['get', 'patch'],
         url_path='me', url_name='me',
+        permission_classes=(IsAuthenticated,)
     )
     def about_me(self, request):
         serializer = UserSerializer(request.user)
