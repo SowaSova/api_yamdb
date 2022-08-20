@@ -34,15 +34,24 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+    class Meta:
+        ordering = ['username']
+
 
 class Genre(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
 
+    class Meta:
+        ordering = ['name']
+
 
 class Category(models.Model):
     name = models.CharField(max_length=256)
     slug = models.SlugField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ['name']
 
 
 class Title(models.Model):
@@ -63,6 +72,7 @@ class Title(models.Model):
                 name='year_lte_now'
             )
         ]
+        ordering = ['name']
 
     @property
     def rating(self):
@@ -100,6 +110,8 @@ class Review(models.Model):
                 name='unique author review')
         ]
 
+        ordering = ['-pub_date']
+
 
 class Comment(models.Model):
     review = models.ForeignKey(
@@ -110,3 +122,6 @@ class Comment(models.Model):
         User, on_delete=models.CASCADE, related_name="comments")
     pub_date = models.DateTimeField(
         "Дата добавления", auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ['-pub_date']
