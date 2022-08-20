@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
-from reviews.models import Review, Comment, Category, Genre, Title
-from rest_framework import filters, mixins, pagination, viewsets, status
+from reviews.models import Review, Category, Genre, Title
+from rest_framework import filters, mixins, viewsets, status
 from .serializers import (
     CommentSerializer, ReviewSerializer,
     CategorySerializer, GenreSerializer,
@@ -10,7 +10,7 @@ from .serializers import (
 from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly, IsAdmin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes, action
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
@@ -127,14 +127,15 @@ def signup(request):
         )
 
         confirmation_code = default_token_generator.make_token(user)
-        confirmation_code_hashed = make_password(confirmation_code, salt='well')
+        confirmation_code_hashed = make_password(
+            confirmation_code, salt='well')
 
         user.confirmation_code = confirmation_code_hashed
         user.save()
 
         send_mail(
             'Код подтверждения',
-            f'{user.username}, ваш код: {confirmation_code} /api/v1/auth/token/',
+            f'{user.username}, код: {confirmation_code} /api/v1/auth/token/',
             'from_russia@with_love.ru',
             [f'{user.email}'])
         return Response(serializer.data)
@@ -146,14 +147,15 @@ def signup(request):
 def get_token(request):
     serializer = TokenSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
-        user = User.objects.get(username=serializer.initial_data['username'])
+        username = serializer.data['username']
+        user = get_object_or_404(User, username=username)
         c_code = serializer.initial_data['confirmation_code']
         if check_password(c_code, user.confirmation_code):
             refresh = RefreshToken.for_user(user)
             return Response({'access': str(refresh.access_token)})
         raise ValidationError()
 
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class UserViewSet(viewsets.ModelViewSet):
