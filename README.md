@@ -7,7 +7,7 @@ git clone https://github.com/SowaSova/api_yamdb.git
 ```
 
 ```
-cd yatube_api
+cd api_yamdb
 ```
 
 Cоздать и активировать виртуальное окружение:
@@ -34,6 +34,12 @@ pip install -r requirements.txt
 
 ```
 python3 manage.py migrate
+```
+
+Импортировать данные:
+
+```
+python3 manage.py insert_data
 ```
 
 Запустить проект:
