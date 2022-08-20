@@ -18,6 +18,8 @@ from django.contrib.auth.hashers import make_password, check_password
 from django.core.mail import send_mail
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
+import django_filters
+from django_filters import rest_framework
 
 
 User = get_user_model()
@@ -101,6 +103,19 @@ class GenresViewSet(ListCreateDestroyViewSet):
     search_fields = ('name',)
 
 
+class TitleFilter(django_filters.FilterSet):
+    category = rest_framework.CharFilter(field_name='category__slug')
+    genre = rest_framework.CharFilter(field_name='genre__slug')
+    name = rest_framework.CharFilter(
+        field_name='name', lookup_expr='icontains')
+
+    class Meta:
+        model = Title
+        fields = {
+            'year': ['exact']
+        }
+
+
 class TitlesViewSet(viewsets.ModelViewSet):
     """
     Получить список произведений и данные по одному
@@ -113,7 +128,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     pagination_class = pagination.LimitOffsetPagination
 
     filter_backends = (DjangoFilterBackend,)
-    filterset_fields = ('category__slug', 'genre__slug', 'name', 'year')
+    filterset_class = TitleFilter
 
     def get_serializer_class(self):
         if self.action in ['list', 'retrieve']:
