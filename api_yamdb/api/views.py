@@ -135,7 +135,7 @@ def signup(request):
 
         send_mail(
             'Код подтверждения',
-            f'{user.username}, ваш код: {confirmation_code} /api/v1/auth/token/',
+            f'{user.username}, код: {confirmation_code} /api/v1/auth/token/',
             'from_russia@with_love.ru',
             [f'{user.email}'])
         return Response(serializer.data)
