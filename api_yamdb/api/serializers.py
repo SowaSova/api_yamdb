@@ -33,29 +33,39 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(many=True)
-    category = CategorySerializer()
-    rating = serializers.SerializerMethodField()
+    genre = SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True)
+    category = SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
 
     class Meta:
         model = Title
         fields = (
             'id', 'name', 'year', 'rating', 'description', 'genre', 'category')
 
-    def validate(self, value):
+    def validate_year(self, value):
         if value > timezone.now().year:
             raise ValidationError(
                 'Год выхода произведения еще не наступил!')
+        return value
 
-    def get_rating(self, obj):
-        return obj.rating
+
+class TitleDisplaySerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
+
+    class Meta:
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre',
+            'category')
 
 
 class ReviewSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field="username", read_only="True")
+    score = serializers.IntegerField(required=True)
 
     class Meta:
-        fields = "__all__"
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
 
@@ -63,5 +73,57 @@ class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field="username", read_only="True")
 
     class Meta:
-        fields = "__all__"
+        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
+
+
+class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    email = serializers.CharField(required=True)
+    role = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'role',
+            'bio',
+            'first_name',
+            'last_name'
+        )
+
+
+class AdminSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'username',
+            'email',
+            'role',
+            'bio',
+            'first_name',
+            'last_name'
+        )
+
+
+class SignupSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise ValidationError()
+        return value
+
+
+class TokenSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=True)
+    confirmation_code = serializers.CharField(required=True)
+
+    class Meta:
+        model = User
+        fields = ('username', 'confirmation_code')

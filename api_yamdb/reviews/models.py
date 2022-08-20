@@ -30,6 +30,7 @@ class User(AbstractUser):
         choices=ROLE_CHOICES,
         default=USER,
     )
+    confirmation_code = models.CharField(max_length=30)
 
     def __str__(self):
         return self.username
@@ -66,9 +67,7 @@ class Title(models.Model):
 
     @property
     def rating(self):
-        if self._rating:
-            return self._rating
-        return self.reviews.aggregate(Avg('score'))
+        return self.reviews.aggregate(Avg('score'))['score__avg']
 
 
 class GenreTitle(models.Model):
@@ -77,7 +76,8 @@ class GenreTitle(models.Model):
 
 
 class Review(models.Model):
-    title = models.ForeignKey(Title, on_delete=models.CASCADE, related_name="reviews")
+    title = models.ForeignKey(
+        Title, on_delete=models.CASCADE, related_name="reviews")
     text = models.TextField()
     author = models.ForeignKey(
         User,
@@ -90,7 +90,15 @@ class Review(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(10)],
         error_messages={'validators': 'От одного до десяти!'}
     )
-    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField(
+        "Дата добавления", auto_now_add=True, db_index=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='unique author review')
+        ]
 
 
 class Comment(models.Model):
@@ -98,5 +106,7 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
-    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True, db_index=True)
+    author = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="comments")
+    pub_date = models.DateTimeField(
+        "Дата добавления", auto_now_add=True, db_index=True)

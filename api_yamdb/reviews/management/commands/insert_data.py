@@ -15,7 +15,6 @@ FILES_MODELS = {
 }
 
 PK_FIELDS = {
-    'review_id': 'Review',
     'author': 'User',
     'category': 'Category'
 }
@@ -56,6 +55,7 @@ class Command(BaseCommand):
         # т.к. они могут зависеть от данных в других файлах
         # Сначала хотел брать их из аргументов, но не нашел смысла в этом.
         filenames = [
+            'users.csv', 'review.csv', 'comments.csv',
             'category.csv', 'titles.csv', 'genre.csv', 'genre_title.csv']
         for filename in filenames:
             model_name = FILES_MODELS.get(filename)
