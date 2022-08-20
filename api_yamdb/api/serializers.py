@@ -42,12 +42,11 @@ class TitleSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         category = validated_data.pop('category')
         genres = validated_data.pop('genre')
-
-        category = get_object_or_404(Category, slug=category)
+        category = get_object_or_404(Category, slug=category.slug)
         title = Title.objects.create(**validated_data, category=category)
         for genre in genres:
-            genre = get_object_or_404(Genre, slug=genre)
-            GenreTitle.objects.create(title=title, genre=genre)
+            g = get_object_or_404(Genre, slug=genre.slug)
+            GenreTitle.objects.create(title=title, genre=g)
 
         return title
 
