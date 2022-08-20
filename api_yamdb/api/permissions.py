@@ -1,25 +1,20 @@
 from rest_framework import permissions
 
 
-# class AuthorOrReadOnly(permissions.BasePermission):
-#
-#     def has_object_permission(self, request, view, obj):
-#         if request.method in permissions.SAFE_METHODS:
-#             return True
-#         return obj.author == request.user
-
-
 class StaffOrAuthorOrReadOnly(permissions.BasePermission):
-    # def has_permission(self, request, view):
-    #     return (
-    #             request.method in permissions.SAFE_METHODS or request.user.is_authenticated
-    #     )
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or request.user.is_authenticated
+        )
 
     def has_object_permission(self, request, view, obj):
         return (
             request.method in permissions.SAFE_METHODS
-            or request.user.is_staff
-            or obj.author == request.user
+            or request.method == 'POST' and request.user.is_authenticated
+            or request.method in ['PATCH', 'DELETE'] and (
+                request.user.role in ['moderator', 'admin']
+                or request.user == obj.author)
         )
 
 
@@ -69,3 +64,32 @@ class ReadOnly(permissions.BasePermission):
 
     def has_permission(self, request, view):
         return request.method in permissions.SAFE_METHODS
+
+
+class AuthorOrAdmin(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (
+            view.action == 'list'
+            and request.user.is_authenticated
+            and request.user.role == 'admin'
+            or view.action != 'list' and request.user.is_authenticated
+        )
+
+    def has_object_permission(self, request, view, obj):
+        # if request.user == obj and request.methed in ['GET', 'PATCH']:
+        #     return True
+        if (
+            request.user.role == 'admin'
+            and request.method in ['POST', 'GET', 'PATCH', 'DELETE']
+        ):
+            return True
+        return False
+
+
+class AuthorOrAdminOrModerator(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return (
+            self.method in permissions.SAFE_METHODS
+            or self.method == 'POST' and request.user.is_authenticated
+            or self.method in ['PATCH', 'DELETE'] and request.user.role in ['admin', 'moderator']
+        )

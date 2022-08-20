@@ -4,9 +4,10 @@ from rest_framework import filters, mixins, pagination, viewsets
 from .serializers import (
     CommentSerializer, ReviewSerializer,
     CategorySerializer, GenreSerializer,
-    TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer
+    TitleSerializer, SignupSerializer, TokenSerializer, UserSerializer,
+    TitleDisplaySerializer
 )
-from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly
+from .permissions import StaffOrAuthorOrReadOnly, AdminOrReadOnly, AuthorOrAdmin
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
@@ -35,7 +36,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     """
 
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, StaffOrAuthorOrReadOnly]
+    permission_classes = (StaffOrAuthorOrReadOnly,)
 
     def get_queryset(self):
         review_id = self.kwargs.get('review_id')
@@ -53,7 +54,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
     Только одно ревью к одному фильму.
     """
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, StaffOrAuthorOrReadOnly]
+    permission_classes = [StaffOrAuthorOrReadOnly]
 
     def get_queryset(self):
         title_id = self.kwargs.get('title_id')
@@ -75,6 +76,7 @@ class CategoriesViewSet(ListCreateDestroyViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    lookup_field = 'slug'
     permission_classes = (AdminOrReadOnly,)
 
     filter_backends = (filters.SearchFilter,)
@@ -88,6 +90,7 @@ class GenresViewSet(ListCreateDestroyViewSet):
     """
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    lookup_field = 'slug'
     permission_classes = (AdminOrReadOnly,)
 
     filter_backends = (filters.SearchFilter,)
@@ -107,12 +110,17 @@ class TitlesViewSet(viewsets.ModelViewSet):
     filter_backends = (DjangoFilterBackend,)
     filterset_fields = ('category', 'genre', 'name', 'year')
 
+    def get_serializer_class(self):
+        if self.action in ['list', 'retrieve']:
+            return TitleDisplaySerializer
+        return TitleSerializer
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def signup(request):
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         user = User.objects.create(
             email=serializer.validated_data['email'],
             username=serializer.validated_data['username']
@@ -137,12 +145,13 @@ def signup(request):
 @permission_classes([AllowAny])
 def get_token(request):
     serializer = TokenSerializer(data=request.data)
-    if serializer.is_valid():
+    if serializer.is_valid(raise_exception=True):
         user = User.objects.get(username=serializer.initial_data['username'])
         c_code = serializer.initial_data['confirmation_code']
         if check_password(c_code, user.confirmation_code):
             refresh = RefreshToken.for_user(user)
             return Response({'access': str(refresh.access_token)})
+        raise ValidationError()
 
     return Response(serializer.errors)
 
@@ -150,3 +159,5 @@ def get_token(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = (AuthorOrAdmin,)
+    lookup_field = 'username'

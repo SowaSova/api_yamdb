@@ -33,7 +33,8 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = SlugRelatedField(slug_field='slug', queryset=Genre.objects.all(), many=True)
+    genre = SlugRelatedField(
+        slug_field='slug', queryset=Genre.objects.all(), many=True)
     category = SlugRelatedField(slug_field='slug', queryset=Category.objects.all())
 
     class Meta:
@@ -48,11 +49,23 @@ class TitleSerializer(serializers.ModelSerializer):
         return value
 
 
-class ReviewSerializer(serializers.ModelSerializer):
-    author = SlugRelatedField(slug_field="username", read_only="True")
+class TitleDisplaySerializer(serializers.ModelSerializer):
+    genre = GenreSerializer(many=True)
+    category = CategorySerializer()
 
     class Meta:
-        fields = "__all__"
+        model = Title
+        fields = (
+            'id', 'name', 'year', 'rating', 'description', 'genre',
+            'category')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    author = SlugRelatedField(slug_field="username", read_only="True")
+    score = serializers.IntegerField(required=True)
+
+    class Meta:
+        fields = ('id', 'text', 'author', 'score', 'pub_date')
         model = Review
 
 
@@ -60,7 +73,7 @@ class CommentSerializer(serializers.ModelSerializer):
     author = SlugRelatedField(slug_field="username", read_only="True")
 
     class Meta:
-        fields = "__all__"
+        fields = ('id', 'text', 'author', 'pub_date')
         model = Comment
 
 
@@ -103,6 +116,11 @@ class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise ValidationError()
+        return value
 
 
 class TokenSerializer(serializers.ModelSerializer):
