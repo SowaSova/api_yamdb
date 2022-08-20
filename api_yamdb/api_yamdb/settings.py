@@ -1,5 +1,8 @@
 import os
+from dotenv import load_dotenv
 from datetime import timedelta
+
+load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -113,8 +116,8 @@ AUTH_USER_MODEL = 'reviews.User'
 
 EMAIL_HOST = 'smtp.mail.ru'
 EMAIL_PORT = 2525
-EMAIL_HOST_USER = "for_exaple111.mail.ru"
-EMAIL_HOST_PASSWORD = "g6LBmcEtszGimCAaaPiV"
+EMAIL_HOST_USER = os.getenv('USERNAME')
+EMAIL_HOST_PASSWORD = os.getenv('PASSWORD')
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
 
