@@ -5,7 +5,6 @@ from .validators import validate_username
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db.models import Avg
 
-
 USER = 'user'
 ADMIN = 'admin'
 MODERATOR = 'moderator'
@@ -77,7 +76,8 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name="reviews")
+        Title, on_delete=models.CASCADE, related_name="reviews",
+        db_constraint=False)
     text = models.TextField()
     author = models.ForeignKey(
         User,
