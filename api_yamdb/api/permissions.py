@@ -41,12 +41,3 @@ class IsAdmin(permissions.BasePermission):
             user.is_authenticated and user.role == 'admin'
             or user.is_superuser
         )
-
-
-class AuthorOrAdminOrModerator(permissions.BasePermission):
-    def has_permission(self, request, view):
-        return (
-            self.method in permissions.SAFE_METHODS
-            or self.method == 'POST' and request.user.is_authenticated
-            or self.method in ['PATCH', 'DELETE'] and request.user.role in ['admin', 'moderator']
-        )
