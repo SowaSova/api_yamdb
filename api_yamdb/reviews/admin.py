@@ -9,6 +9,6 @@ class UserAdmin(admin.ModelAdmin):
         'username', 'email', 'role',
         'bio', 'first_name', 'last_name',
     )
-
+    list_editable = ('role',)
 
 admin.site.register(User, UserAdmin)
