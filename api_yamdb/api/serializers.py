@@ -95,8 +95,6 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class AdminSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
 
     class Meta:
         model = User
@@ -111,7 +109,6 @@ class AdminSerializer(serializers.ModelSerializer):
 
 
 class SignupSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
 
     class Meta:
         model = User
