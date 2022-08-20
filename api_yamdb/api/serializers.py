@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 from django.contrib.auth import get_user_model
-from reviews.models import Category, Genre, Title, Review, Comment
+from reviews.models import Category, Genre, Title, Review, Comment, GenreTitle
 from rest_framework.exceptions import ValidationError
 from django.utils import timezone
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -37,6 +38,18 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field='slug', queryset=Genre.objects.all(), many=True)
     category = SlugRelatedField(
         slug_field='slug', queryset=Category.objects.all())
+
+    def create(self, validated_data):
+        category = validated_data.pop('category')
+        genres = validated_data.pop('genre')
+
+        category = get_object_or_404(Category, slug=category)
+        title = Title.objects.create(**validated_data, category=category)
+        for genre in genres:
+            genre = get_object_or_404(Genre, slug=genre)
+            GenreTitle.objects.create(title=title, genre=genre)
+
+        return title
 
     class Meta:
         model = Title
