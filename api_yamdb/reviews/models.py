@@ -1,13 +1,14 @@
-from django.db import models
-from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
-from .validators import validate_username
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
 from django.db.models import Avg
+from django.utils import timezone
 
-USER = 'user'
-ADMIN = 'admin'
-MODERATOR = 'moderator'
+from .validators import validate_username
+
+USER = "user"
+ADMIN = "admin"
+MODERATOR = "moderator"
 
 ROLE_CHOICES = [
     (USER, USER),
@@ -35,7 +36,7 @@ class User(AbstractUser):
         return self.username
 
     class Meta:
-        ordering = ['username']
+        ordering = ["username"]
 
 
 class Genre(models.Model):
@@ -43,7 +44,7 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Category(models.Model):
@@ -51,7 +52,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Title(models.Model):
@@ -59,24 +60,22 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField()
     rating = models.PositiveSmallIntegerField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
-    genre = models.ManyToManyField(
-        Genre, through='GenreTitle', related_name='titles')
+    genre = models.ManyToManyField(Genre, through="GenreTitle", related_name="titles")
     category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL,
-        blank=True, null=True)
+        Category, on_delete=models.SET_NULL, blank=True, null=True
+    )
 
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(year__lte=timezone.now().year),
-                name='year_lte_now'
+                check=models.Q(year__lte=timezone.now().year), name="year_lte_now"
             )
         ]
-        ordering = ['name']
+        ordering = ["name"]
 
     @property
     def rating(self):
-        return self.reviews.aggregate(Avg('score'))['score__avg']
+        return self.reviews.aggregate(Avg("score"))["score__avg"]
 
 
 class GenreTitle(models.Model):
@@ -86,8 +85,8 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name="reviews",
-        db_constraint=False)
+        Title, on_delete=models.CASCADE, related_name="reviews", db_constraint=False
+    )
     text = models.TextField()
     author = models.ForeignKey(
         User,
@@ -98,19 +97,18 @@ class Review(models.Model):
         "Оценка",
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(10)],
-        error_messages={'validators': 'От одного до десяти!'}
+        error_messages={"validators": "От одного до десяти!"},
     )
-    pub_date = models.DateTimeField(
-        "Дата добавления", auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True, db_index=True)
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'author'],
-                name='unique author review')
+                fields=["title", "author"], name="unique author review"
+            )
         ]
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
 
 class Comment(models.Model):
@@ -118,10 +116,8 @@ class Comment(models.Model):
         Review, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField()
-    author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="comments")
-    pub_date = models.DateTimeField(
-        "Дата добавления", auto_now_add=True, db_index=True)
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="comments")
+    pub_date = models.DateTimeField("Дата добавления", auto_now_add=True, db_index=True)
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]

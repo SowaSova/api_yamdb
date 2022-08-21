@@ -1,27 +1,24 @@
 import csv
 import os
-from django.core.management.base import BaseCommand
+
 from django.conf import settings
+from django.core.management.base import BaseCommand
 from reviews import models
 
 FILES_MODELS = {
-    'category.csv': 'Category',
-    'genre.csv': 'Genre',
-    'titles.csv': 'Title',
-    'review.csv': 'Review',
-    'comments.csv': 'Comment',
-    'users.csv': 'User',
-    'genre_title.csv': 'GenreTitle'
+    "category.csv": "Category",
+    "genre.csv": "Genre",
+    "titles.csv": "Title",
+    "review.csv": "Review",
+    "comments.csv": "Comment",
+    "users.csv": "User",
+    "genre_title.csv": "GenreTitle",
 }
 
-PK_FIELDS = {
-    'author': 'User',
-    'category': 'Category'
-}
+PK_FIELDS = {"author": "User", "category": "Category"}
 
 
 class Command(BaseCommand):
-
     def send_to_db(self, fields, values, model_name):
         model = getattr(models, model_name)
         model.objects.all().delete()
@@ -49,14 +46,20 @@ class Command(BaseCommand):
             model.objects.create(**new_row)
 
     def handle(self, *args, **kwargs):
-        FILES_DIR = os.path.join(settings.STATICFILES_DIRS[0], 'data')
+        FILES_DIR = os.path.join(settings.STATICFILES_DIRS[0], "data")
 
         # Надежнее вручную установить порядок обработки файлов,
         # т.к. они могут зависеть от данных в других файлах
         # Сначала хотел брать их из аргументов, но не нашел смысла в этом.
         filenames = [
-            'users.csv', 'review.csv', 'comments.csv',
-            'category.csv', 'titles.csv', 'genre.csv', 'genre_title.csv']
+            "users.csv",
+            "review.csv",
+            "comments.csv",
+            "category.csv",
+            "titles.csv",
+            "genre.csv",
+            "genre_title.csv",
+        ]
         for filename in filenames:
             model_name = FILES_MODELS.get(filename)
             # Добавляем данные только в модели, которые уже созданы в БД
@@ -65,10 +68,10 @@ class Command(BaseCommand):
 
             file_path = os.path.join(FILES_DIR, filename)
             with open(file_path) as csv_file:
-                csv_reader = csv.reader(csv_file, delimiter=',')
+                csv_reader = csv.reader(csv_file, delimiter=",")
                 fields, values = [], []
                 for idx, row in enumerate(csv_reader):
-                    if row == '':
+                    if row == "":
                         continue
                     # Названия полей сохраняем отдельно
                     if idx == 0:
