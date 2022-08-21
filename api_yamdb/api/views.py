@@ -40,9 +40,7 @@ class ListCreateDestroyViewSet(
 
 
 class CommentViewSet(viewsets.ModelViewSet):
-    """
-    Комментарии к отзывам.
-    """
+    """Комментарии к отзывам."""
 
     serializer_class = CommentSerializer
     permission_classes = (StaffOrAuthorOrReadOnly,)
@@ -60,9 +58,7 @@ class CommentViewSet(viewsets.ModelViewSet):
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
-    """
-    Только одно ревью к одному фильму.
-    """
+    """Только одно ревью к одному фильму."""
 
     serializer_class = ReviewSerializer
     permission_classes = [StaffOrAuthorOrReadOnly]
@@ -82,10 +78,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CategoriesViewSet(ListCreateDestroyViewSet):
-    """
-    Получить список категорий, добавить или удалить
-    категорию.
-    """
+    """Получить список категорий, добавить или удалить категорию."""
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
@@ -98,10 +91,7 @@ class CategoriesViewSet(ListCreateDestroyViewSet):
 
 
 class GenresViewSet(ListCreateDestroyViewSet):
-    """
-    Получить список жанров, добавить или удалить
-    жанр.
-    """
+    """Получить список жанров, добавить или удалить жанр."""
 
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -114,10 +104,9 @@ class GenresViewSet(ListCreateDestroyViewSet):
 
 
 class TitlesViewSet(viewsets.ModelViewSet):
-    """
-    Получить список произведений и данные по одному
-    произведению. Также Добавить произведение, изменить
-    и удалить его.
+    """Получить список произведений и данные по одному произведению.
+
+    Также Добавить произведение, изменить и удалить его.
     """
 
     queryset = Title.objects.all()
@@ -137,10 +126,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def signup(request):
-    """
-    Принимает почту и юзернейм, в ответ отправляет
-    код подтверждения.
-    """
+    """Принимает почту и юзернейм, в ответ отправляет код подтверждения."""
     serializer = SignupSerializer(data=request.data)
     if serializer.is_valid(raise_exception=True):
         user = User.objects.create(
@@ -149,7 +135,9 @@ def signup(request):
         )
 
         confirmation_code = default_token_generator.make_token(user)
-        confirmation_code_hashed = make_password(confirmation_code, salt="well")
+        confirmation_code_hashed = make_password(
+            confirmation_code, salt="well"
+        )
 
         user.confirmation_code = confirmation_code_hashed
         user.save()
@@ -167,8 +155,8 @@ def signup(request):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def get_token(request):
-    """
-    Принимает код подтверждения, сравнивает его с хешем.
+    """Принимает код подтверждения, сравнивает его с хешем.
+
     В ответ отправляет токен.
     """
     serializer = TokenSerializer(data=request.data)
@@ -185,10 +173,10 @@ def get_token(request):
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    Админ может получить список пользователей, добаввить
-    одного. Получить, изменить его данные. Удалить его.
-    Сам пользователь может получить и изменить свои данные.
+    """Админ может получить список пользователей, добаввить одного.
+
+    Получить, изменить его данные. Удалить его. Сам пользователь может
+    получить и изменить свои данные.
     """
 
     queryset = User.objects.all()
@@ -208,7 +196,9 @@ class UserViewSet(viewsets.ModelViewSet):
     def about_me(self, request):
         serializer = UserSerializer(request.user)
         if request.method == "PATCH":
-            serializer = UserSerializer(request.user, data=request.data, partial=True)
+            serializer = UserSerializer(
+                request.user, data=request.data, partial=True
+            )
             serializer.is_valid(raise_exception=True)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

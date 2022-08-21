@@ -30,7 +30,10 @@ class Migration(migrations.Migration):
                         verbose_name="ID",
                     ),
                 ),
-                ("password", models.CharField(max_length=128, verbose_name="password")),
+                (
+                    "password",
+                    models.CharField(max_length=128, verbose_name="password"),
+                ),
                 (
                     "last_login",
                     models.DateTimeField(
@@ -64,7 +67,8 @@ class Migration(migrations.Migration):
                 (
                     "date_joined",
                     models.DateTimeField(
-                        default=django.utils.timezone.now, verbose_name="date joined"
+                        default=django.utils.timezone.now,
+                        verbose_name="date joined",
                     ),
                 ),
                 (
@@ -171,7 +175,8 @@ class Migration(migrations.Migration):
                 (
                     "genre",
                     models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE, to="reviews.Genre"
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="reviews.Genre",
                     ),
                 ),
             ],
@@ -238,7 +243,9 @@ class Migration(migrations.Migration):
                 (
                     "pub_date",
                     models.DateTimeField(
-                        auto_now_add=True, db_index=True, verbose_name="Дата добавления"
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата добавления",
                     ),
                 ),
                 (
@@ -282,7 +289,9 @@ class Migration(migrations.Migration):
                 (
                     "pub_date",
                     models.DateTimeField(
-                        auto_now_add=True, db_index=True, verbose_name="Дата добавления"
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата добавления",
                     ),
                 ),
                 (

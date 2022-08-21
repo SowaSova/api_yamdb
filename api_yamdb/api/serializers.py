@@ -16,12 +16,16 @@ class CategorySerializer(serializers.ModelSerializer):
 
     def validate_name(self, value):
         if len(value) > 256:
-            raise ValidationError("Название не должно быть длиннее 256 символов!")
+            raise ValidationError(
+                "Название не должно быть длиннее 256 символов!"
+            )
         return value
 
     def validate_slug(self, value):
         if len(value) > 50:
-            raise ValidationError("Длина слага должна быть не более 50 символов!")
+            raise ValidationError(
+                "Длина слага должна быть не более 50 символов!"
+            )
         return value
 
 
@@ -32,8 +36,12 @@ class GenreSerializer(serializers.ModelSerializer):
 
 
 class TitleSerializer(serializers.ModelSerializer):
-    genre = SlugRelatedField(slug_field="slug", queryset=Genre.objects.all(), many=True)
-    category = SlugRelatedField(slug_field="slug", queryset=Category.objects.all())
+    genre = SlugRelatedField(
+        slug_field="slug", queryset=Genre.objects.all(), many=True
+    )
+    category = SlugRelatedField(
+        slug_field="slug", queryset=Category.objects.all()
+    )
 
     def create(self, validated_data):
         category = validated_data.pop("category")
@@ -48,7 +56,15 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ("id", "name", "year", "rating", "description", "genre", "category")
+        fields = (
+            "id",
+            "name",
+            "year",
+            "rating",
+            "description",
+            "genre",
+            "category",
+        )
 
     def validate_year(self, value):
         if value > timezone.now().year:
@@ -62,7 +78,15 @@ class TitleDisplaySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ("id", "name", "year", "rating", "description", "genre", "category")
+        fields = (
+            "id",
+            "name",
+            "year",
+            "rating",
+            "description",
+            "genre",
+            "category",
+        )
 
 
 class ReviewSerializer(serializers.ModelSerializer):
@@ -89,13 +113,27 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ("username", "email", "role", "bio", "first_name", "last_name")
+        fields = (
+            "username",
+            "email",
+            "role",
+            "bio",
+            "first_name",
+            "last_name",
+        )
 
 
 class AdminSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ("username", "email", "role", "bio", "first_name", "last_name")
+        fields = (
+            "username",
+            "email",
+            "role",
+            "bio",
+            "first_name",
+            "last_name",
+        )
 
 
 class SignupSerializer(serializers.ModelSerializer):

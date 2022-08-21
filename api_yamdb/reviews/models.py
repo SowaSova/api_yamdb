@@ -6,9 +6,9 @@ from django.utils import timezone
 
 from .validators import validate_username
 
-USER = 'user'
-ADMIN = 'admin'
-MODERATOR = 'moderator'
+USER = "user"
+ADMIN = "admin"
+MODERATOR = "moderator"
 
 ROLE_CHOICES = [
     (USER, USER),
@@ -36,7 +36,7 @@ class User(AbstractUser):
         return self.username
 
     class Meta:
-        ordering = ['username']
+        ordering = ["username"]
 
 
 class Genre(models.Model):
@@ -44,7 +44,7 @@ class Genre(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Category(models.Model):
@@ -52,7 +52,7 @@ class Category(models.Model):
     slug = models.SlugField(max_length=50, unique=True)
 
     class Meta:
-        ordering = ['name']
+        ordering = ["name"]
 
 
 class Title(models.Model):
@@ -61,7 +61,8 @@ class Title(models.Model):
     rating = models.PositiveSmallIntegerField(blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     genre = models.ManyToManyField(
-        Genre, through='GenreTitle', related_name='titles')
+        Genre, through="GenreTitle", related_name="titles"
+    )
     category = models.ForeignKey(
         Category, on_delete=models.SET_NULL, blank=True, null=True
     )
@@ -69,14 +70,15 @@ class Title(models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
-                check=models.Q(year__lte=timezone.now().year), name='year_lte_now'
+                check=models.Q(year__lte=timezone.now().year),
+                name="year_lte_now",
             )
         ]
-        ordering = ['name']
+        ordering = ["name"]
 
     @property
     def rating(self):
-        return self.reviews.aggregate(Avg('score'))['score__avg']
+        return self.reviews.aggregate(Avg("score"))["score__avg"]
 
 
 class GenreTitle(models.Model):
@@ -86,42 +88,48 @@ class GenreTitle(models.Model):
 
 class Review(models.Model):
     title = models.ForeignKey(
-        Title, on_delete=models.CASCADE, related_name='reviews', db_constraint=False
+        Title,
+        on_delete=models.CASCADE,
+        related_name="reviews",
+        db_constraint=False,
     )
     text = models.TextField()
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='reviews',
+        related_name="reviews",
     )
     score = models.PositiveSmallIntegerField(
-        'Оценка',
+        "Оценка",
         default=1,
         validators=[MinValueValidator(1), MaxValueValidator(10)],
-        error_messages={'validators': 'От одного до десяти!'},
+        error_messages={"validators": "От одного до десяти!"},
     )
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        "Дата добавления", auto_now_add=True, db_index=True
+    )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=['title', 'author'], name='unique author review'
+                fields=["title", "author"], name="unique author review"
             )
         ]
 
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
 
 
 class Comment(models.Model):
     review = models.ForeignKey(
-        Review, on_delete=models.CASCADE, related_name='comments'
+        Review, on_delete=models.CASCADE, related_name="comments"
     )
     text = models.TextField()
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='comments')
+        User, on_delete=models.CASCADE, related_name="comments"
+    )
     pub_date = models.DateTimeField(
-        'Дата добавления', auto_now_add=True, db_index=True)
+        "Дата добавления", auto_now_add=True, db_index=True
+    )
 
     class Meta:
-        ordering = ['-pub_date']
+        ordering = ["-pub_date"]
