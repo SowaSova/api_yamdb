@@ -34,7 +34,7 @@ class IsAdmin(permissions.BasePermission):
         return (
             user.is_authenticated
             and user.role == "admin"
-            or user.is_superuser()
+            or user.is_superuser
         )
 
     def has_object_permission(self, request, view, obj):
