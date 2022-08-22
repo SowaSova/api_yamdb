@@ -67,7 +67,7 @@ class Command(BaseCommand):
                 continue
 
             file_path = os.path.join(FILES_DIR, filename)
-            with open(file_path) as csv_file:
+            with open(file_path, encoding="UTF-8") as csv_file:
                 csv_reader = csv.reader(csv_file, delimiter=",")
                 fields, values = [], []
                 for idx, row in enumerate(csv_reader):
