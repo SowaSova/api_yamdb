@@ -114,6 +114,7 @@ STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 
 AUTH_USER_MODEL = "reviews.User"
 
+DOMAIN_NAME = 'here@weare.ru'
 EMAIL_HOST = "smtp.mail.ru"
 EMAIL_PORT = 2525
 EMAIL_HOST_USER = os.getenv("USERNAME")
