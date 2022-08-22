@@ -1,3 +1,4 @@
+from urllib import request
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -14,20 +15,6 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("name", "slug")
-
-    def validate_name(self, value):
-        if len(value) > 256:
-            raise ValidationError(
-                "Название не должно быть длиннее 256 символов!"
-            )
-        return value
-
-    def validate_slug(self, value):
-        if len(value) > 50:
-            raise ValidationError(
-                "Длина слага должна быть не более 50 символов!"
-            )
-        return value
 
 
 class GenreSerializer(serializers.ModelSerializer):
