@@ -61,7 +61,9 @@ def user_superuser_client(token_user_superuser):
     from rest_framework.test import APIClient
 
     client = APIClient()
-    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token_user_superuser["access"]}')
+    client.credentials(
+        HTTP_AUTHORIZATION=f'Bearer {token_user_superuser["access"]}'
+    )
     return client
 
 
@@ -101,7 +103,9 @@ def moderator_client(token_moderator):
     from rest_framework.test import APIClient
 
     client = APIClient()
-    client.credentials(HTTP_AUTHORIZATION=f'Bearer {token_moderator["access"]}')
+    client.credentials(
+        HTTP_AUTHORIZATION=f'Bearer {token_moderator["access"]}'
+    )
     return client
 
 

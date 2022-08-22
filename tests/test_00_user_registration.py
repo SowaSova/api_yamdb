@@ -124,7 +124,9 @@ class Test00UserRegistration:
 
         valid_data = {"email": valid_email, "username": valid_username}
         request_type = "POST"
-        response = admin_client.post(self.url_admin_create_user, data=valid_data)
+        response = admin_client.post(
+            self.url_admin_create_user, data=valid_data
+        )
         outbox_after = mail.outbox
 
         assert (
@@ -181,7 +183,10 @@ class Test00UserRegistration:
             f"возвращается статус {code}"
         )
 
-        invalid_data = {"username": "unexisting_user", "confirmation_code": 12345}
+        invalid_data = {
+            "username": "unexisting_user",
+            "confirmation_code": 12345,
+        }
         response = client.post(self.url_token, data=invalid_data)
         code = 404
         assert response.status_code == code, (
@@ -238,14 +243,20 @@ class Test00UserRegistration:
             f"можно создать пользователя с валидными данными и возвращается статус {code}"
         )
 
-        duplicate_email_data = {"email": valid_email_1, "username": valid_username_2}
+        duplicate_email_data = {
+            "email": valid_email_1,
+            "username": valid_username_2,
+        }
         response = client.post(self.url_signup, data=duplicate_email_data)
         code = 400
         assert response.status_code == code, (
             f"Проверьте, что при {request_type} запросе `{self.url_signup}` нельзя создать "
             f"пользователя, email которого уже зарегистрирован и возвращается статус {code}"
         )
-        duplicate_username_data = {"email": valid_email_2, "username": valid_username_1}
+        duplicate_username_data = {
+            "email": valid_email_2,
+            "username": valid_username_1,
+        }
         response = client.post(self.url_signup, data=duplicate_username_data)
         assert response.status_code == code, (
             f"Проверьте, что при {request_type} запросе `{self.url_signup}` нельзя создать "

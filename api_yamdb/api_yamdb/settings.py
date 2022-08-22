@@ -22,6 +22,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "reviews.apps.ReviewsConfig",
     "api.apps.ApiConfig",
+    "users.apps.UsersConfig",
     "django_filters",
 ]
 
@@ -112,7 +113,7 @@ STATIC_URL = "/static/"
 
 STATICFILES_DIRS = (os.path.join(BASE_DIR, "static/"),)
 
-AUTH_USER_MODEL = "reviews.User"
+AUTH_USER_MODEL = "users.User"
 
 DOMAIN_NAME = 'here@weare.ru'
 EMAIL_HOST = "smtp.mail.ru"
