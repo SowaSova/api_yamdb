@@ -4,16 +4,13 @@
 
 ```
 git clone https://github.com/SowaSova/api_yamdb.git
-```
 
-```
-cd api_yamdb
 ```
 
 Cоздать и активировать виртуальное окружение:
 
 ```
-python3 -m venv env
+python3 -m venv venv
 ```
 
 ```
@@ -28,6 +25,12 @@ python3 -m pip install --upgrade pip
 
 ```
 pip install -r requirements.txt
+```
+
+Перейти в каталог
+
+```
+cd api_yamdb/
 ```
 
 Выполнить миграции:
