@@ -1,3 +1,4 @@
+from urllib import request
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -13,20 +14,6 @@ class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
         fields = ("name", "slug")
-
-    def validate_name(self, value):
-        if len(value) > 256:
-            raise ValidationError(
-                "Название не должно быть длиннее 256 символов!"
-            )
-        return value
-
-    def validate_slug(self, value):
-        if len(value) > 50:
-            raise ValidationError(
-                "Длина слага должна быть не более 50 символов!"
-            )
-        return value
 
 
 class GenreSerializer(serializers.ModelSerializer):
@@ -96,6 +83,17 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("id", "text", "author", "score", "pub_date")
         model = Review
+
+    def validate(self, attrs):
+        user = self.context["request"].user
+        title_id = self.context["view"].kwargs.get("title_id")
+        if title_id is not None and self.context["request"].method != "PATCH":
+            title = get_object_or_404(Title, pk=title_id)
+            if user.reviews.filter(title=title).exists():
+                raise ValidationError(
+                    "Вы уже оставили обзор на это произведение!"
+                )
+        return attrs
 
 
 class CommentSerializer(serializers.ModelSerializer):

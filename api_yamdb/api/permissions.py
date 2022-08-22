@@ -9,15 +9,9 @@ class StaffOrAuthorOrReadOnly(permissions.BasePermission):
         )
 
     def has_object_permission(self, request, view, obj):
-        return (
-            request.method in permissions.SAFE_METHODS
-            or request.method == "POST"
-            and request.user.is_authenticated
-            or request.method in ["PATCH", "DELETE"]
-            and (
-                request.user.role in ["moderator", "admin"]
-                or request.user == obj.author
-            )
+        return request.method in permissions.SAFE_METHODS or (
+            request.user.role in ["moderator", "admin"]
+            or request.user == obj.author
         )
 
 
