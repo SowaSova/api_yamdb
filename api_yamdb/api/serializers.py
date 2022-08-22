@@ -1,4 +1,3 @@
-from urllib import request
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
@@ -103,23 +102,6 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         fields = ("id", "text", "author", "pub_date")
         model = Comment
-
-
-class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(required=True)
-    email = serializers.CharField(required=True)
-    role = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "email",
-            "role",
-            "bio",
-            "first_name",
-            "last_name",
-        )
 
 
 class AdminSerializer(serializers.ModelSerializer):
