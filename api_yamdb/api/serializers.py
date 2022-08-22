@@ -7,6 +7,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.relations import SlugRelatedField
 from reviews.models import Category, Comment, Genre, GenreTitle, Review, Title
 
+
 User = get_user_model()
 
 
@@ -85,14 +86,14 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
 
     def validate(self, attrs):
-        user = self.context["request"].user
-        title_id = self.context["view"].kwargs.get("title_id")
-        if title_id is not None and self.context["request"].method != "PATCH":
+        user = self.context['request'].user
+        title_id = self.context['view'].kwargs.get('title_id')
+
+        if title_id is not None and self.context['request'].method != 'PATCH':
             title = get_object_or_404(Title, pk=title_id)
             if user.reviews.filter(title=title).exists():
                 raise ValidationError(
-                    "Вы уже оставили обзор на это произведение!"
-                )
+                    'Вы уже оставили обзор на это произведение!')
         return attrs
 
 

@@ -11,6 +11,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken
 from reviews.models import Category, Genre, Review, Title
+from api_yamdb.settings import DOMAIN_NAME
 
 from .filters import TitleFilter
 from .permissions import AdminOrReadOnly, IsAdmin, StaffOrAuthorOrReadOnly
@@ -108,7 +109,6 @@ class TitlesViewSet(viewsets.ModelViewSet):
     """
 
     queryset = Title.objects.all()
-    serializer_class = TitleSerializer
     permission_classes = (AdminOrReadOnly,)
     pagination_class = pagination.LimitOffsetPagination
 
@@ -118,7 +118,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action in ["list", "retrieve"]:
             return TitleDisplaySerializer
-        return super().get_serializer_class()
+        return TitleSerializer
 
 
 @api_view(["POST"])
@@ -126,7 +126,7 @@ class TitlesViewSet(viewsets.ModelViewSet):
 def signup(request):
     """Принимает почту и юзернейм, в ответ отправляет код подтверждения."""
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
+    if serializer.is_valid():
         user = User.objects.create(
             email=serializer.validated_data["email"],
             username=serializer.validated_data["username"],
@@ -143,11 +143,11 @@ def signup(request):
         send_mail(
             "Код подтверждения",
             f"{user.username}, код: {confirmation_code} /api/v1/auth/token/",
-            "from_russia@with_love.ru",
+            DOMAIN_NAME,
             [f"{user.email}"],
         )
         return Response(serializer.data)
-    return Response(serializer.errors)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["POST"])
@@ -158,14 +158,14 @@ def get_token(request):
     В ответ отправляет токен.
     """
     serializer = TokenSerializer(data=request.data)
-    if serializer.is_valid(raise_exception=True):
+    if serializer.is_valid():
         username = serializer.data["username"]
         user = get_object_or_404(User, username=username)
-        c_code = serializer.initial_data["confirmation_code"]
+        c_code = serializer.validated_data["confirmation_code"]
         if check_password(c_code, user.confirmation_code):
             refresh = RefreshToken.for_user(user)
             return Response({"access": str(refresh.access_token)})
-        raise ValidationError()
+        raise ValidationError(f'Неверный код подтверждения: {c_code}!')
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -197,7 +197,9 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = UserSerializer(
                 request.user, data=request.data, partial=True
             )
-            serializer.is_valid(raise_exception=True)
+            if not serializer.is_valid():
+                return Response(
+                    serializer.data, status=status.HTTP_400_BAD_REQUEST)
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.data, status=status.HTTP_200_OK)
