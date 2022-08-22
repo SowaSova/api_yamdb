@@ -25,7 +25,6 @@ from .serializers import (
     TitleDisplaySerializer,
     TitleSerializer,
     TokenSerializer,
-    UserSerializer,
 )
 
 User = get_user_model()
@@ -192,14 +191,16 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def about_me(self, request):
-        serializer = UserSerializer(request.user)
+        serializer = AdminSerializer(request.user)
         if request.method == "PATCH":
-            serializer = UserSerializer(
+            serializer = AdminSerializer(
                 request.user, data=request.data, partial=True
             )
             if not serializer.is_valid():
                 return Response(
                     serializer.data, status=status.HTTP_400_BAD_REQUEST)
+            role_user = request.user.role
+            if role_user == "moderator" or role_user == "user":
+                serializer.validated_data['role'] = role_user
             serializer.save()
-
         return Response(serializer.data, status=status.HTTP_200_OK)
