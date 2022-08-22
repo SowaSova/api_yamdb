@@ -4,7 +4,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 def create_users_api(admin_client):
-    data = {"username": "TestUser", "role": "user", "email": "testuser@yamdb.fake"}
+    data = {
+        "username": "TestUser",
+        "role": "user",
+        "email": "testuser@yamdb.fake",
+    }
     admin_client.post("/api/v1/users/", data=data)
     user = get_user_model().objects.get(username=data["username"])
     data = {
@@ -79,7 +83,9 @@ def create_titles(admin_client):
 def create_reviews(admin_client, admin):
     def create_review(uclient, title_id, text, score):
         data = {"text": text, "score": score}
-        response = uclient.post(f"/api/v1/titles/{title_id}/reviews/", data=data)
+        response = uclient.post(
+            f"/api/v1/titles/{title_id}/reviews/", data=data
+        )
         return response.json()["id"]
 
     titles, _, _ = create_titles(admin_client)
@@ -105,7 +111,9 @@ def create_reviews(admin_client, admin):
     )
     result.append(
         {
-            "id": create_review(client_moderator, titles[0]["id"], "qwerty321", 4),
+            "id": create_review(
+                client_moderator, titles[0]["id"], "qwerty321", 4
+            ),
             "author": moderator.username,
             "text": "qwerty321",
             "score": 4,
@@ -118,7 +126,8 @@ def create_comments(admin_client, admin):
     def create_comment(uclient, title_id, review_id, text):
         data = {"text": text}
         response = uclient.post(
-            f"/api/v1/titles/{title_id}/reviews/{review_id}/comments/", data=data
+            f"/api/v1/titles/{title_id}/reviews/{review_id}/comments/",
+            data=data,
         )
         return response.json()["id"]
 
@@ -147,7 +156,10 @@ def create_comments(admin_client, admin):
     result.append(
         {
             "id": create_comment(
-                client_moderator, titles[0]["id"], reviews[0]["id"], "qwerty321"
+                client_moderator,
+                titles[0]["id"],
+                reviews[0]["id"],
+                "qwerty321",
             ),
             "author": moderator.username,
             "text": "qwerty321",

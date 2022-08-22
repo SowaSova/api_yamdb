@@ -111,7 +111,9 @@ class Test02CategoryAPI:
             f"Проверьте, что при POST запросе `/api/v1/categories/` "
             f"с токеном авторизации {user_name} возвращается статус 403"
         )
-        response = client_user.delete(f'/api/v1/categories/{categories[0]["slug"]}/')
+        response = client_user.delete(
+            f'/api/v1/categories/{categories[0]["slug"]}/'
+        )
         assert response.status_code == 403, (
             f"Проверьте, что при DELETE запросе `/api/v1/categories/{{slug}}/` "
             f"с токеном авторизации {user_name} возвращается статус 403"
@@ -126,7 +128,9 @@ class Test02CategoryAPI:
             "Проверьте, что при POST запросе `/api/v1/categories/` "
             "без токена авторизации возвращается статус 401"
         )
-        response = client.delete(f'/api/v1/categories/{categories[0]["slug"]}/')
+        response = client.delete(
+            f'/api/v1/categories/{categories[0]["slug"]}/'
+        )
         assert response.status_code == 401, (
             "Проверьте, что при DELETE запросе `/api/v1/categories/{{slug}}/` "
             "без токена авторизации возвращается статус 401"
