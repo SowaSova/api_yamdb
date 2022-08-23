@@ -164,7 +164,7 @@ def get_token(request):
         if check_password(c_code, user.confirmation_code):
             refresh = RefreshToken.for_user(user)
             return Response({"access": str(refresh.access_token)})
-        raise ValidationError(f'Неверный код подтверждения: {c_code}!')
+        raise ValidationError(f"Неверный код подтверждения: {c_code}!")
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -198,9 +198,10 @@ class UserViewSet(viewsets.ModelViewSet):
             )
             if not serializer.is_valid():
                 return Response(
-                    serializer.data, status=status.HTTP_400_BAD_REQUEST)
+                    serializer.data, status=status.HTTP_400_BAD_REQUEST
+                )
             role_user = request.user.role
             if role_user == "moderator" or role_user == "user":
-                serializer.validated_data['role'] = role_user
+                serializer.validated_data["role"] = role_user
             serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
