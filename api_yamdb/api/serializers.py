@@ -30,17 +30,6 @@ class TitleSerializer(serializers.ModelSerializer):
         slug_field="slug", queryset=Category.objects.all()
     )
 
-    def create(self, validated_data):
-        category = validated_data.pop("category")
-        genres = validated_data.pop("genre")
-        category = get_object_or_404(Category, slug=category.slug)
-        title = Title.objects.create(**validated_data, category=category)
-        for genre in genres:
-            g = get_object_or_404(Genre, slug=genre.slug)
-            GenreTitle.objects.create(title=title, genre=g)
-
-        return title
-
     class Meta:
         model = Title
         fields = (
@@ -85,14 +74,15 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
 
     def validate(self, attrs):
-        user = self.context['request'].user
-        title_id = self.context['view'].kwargs.get('title_id')
+        user = self.context["request"].user
+        title_id = self.context["view"].kwargs.get("title_id")
 
-        if title_id is not None and self.context['request'].method != 'PATCH':
+        if title_id is not None and self.context["request"].method != "PATCH":
             title = get_object_or_404(Title, pk=title_id)
             if user.reviews.filter(title=title).exists():
                 raise ValidationError(
-                    'Вы уже оставили обзор на это произведение!')
+                    "Вы уже оставили обзор на это произведение!"
+                )
         return attrs
 
 
@@ -124,7 +114,7 @@ class SignupSerializer(serializers.ModelSerializer):
 
     def validate_username(self, value):
         if value == "me":
-            raise ValidationError()
+            raise ValidationError('Имя пользователя "me" запрещено.')
         return value
 
 

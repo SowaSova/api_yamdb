@@ -9,78 +9,184 @@ class Migration(migrations.Migration):
 
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Category',
+            name="Category",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256, verbose_name='Категория')),
-                ('slug', models.SlugField(unique=True, verbose_name='Имя ссылки')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=256, verbose_name="Категория"),
+                ),
+                (
+                    "slug",
+                    models.SlugField(unique=True, verbose_name="Имя ссылки"),
+                ),
             ],
             options={
-                'verbose_name': 'Категория',
-                'ordering': ['name'],
+                "verbose_name": "Категория",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='Comment',
+            name="Comment",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(verbose_name="Текст")),
+                (
+                    "pub_date",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата публикации",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Комментарии',
-                'ordering': ['-pub_date'],
+                "verbose_name": "Комментарии",
+                "ordering": ["-pub_date"],
             },
         ),
         migrations.CreateModel(
-            name='Genre',
+            name="Genre",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=256)),
-                ('slug', models.SlugField(unique=True, verbose_name='Имя ссылки')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=256)),
+                (
+                    "slug",
+                    models.SlugField(unique=True, verbose_name="Имя ссылки"),
+                ),
             ],
             options={
-                'verbose_name': 'Жанр',
-                'ordering': ['name'],
+                "verbose_name": "Жанр",
+                "ordering": ["name"],
             },
         ),
         migrations.CreateModel(
-            name='GenreTitle',
+            name="GenreTitle",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Review',
+            name="Review",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('text', models.TextField(verbose_name='Текст')),
-                ('score', models.PositiveSmallIntegerField(default=1, error_messages={'validators': 'От одного до десяти!'}, validators=[django.core.validators.MinValueValidator(1), django.core.validators.MaxValueValidator(10)], verbose_name='Оценка')),
-                ('pub_date', models.DateTimeField(auto_now_add=True, db_index=True, verbose_name='Дата публикации')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("text", models.TextField(verbose_name="Текст")),
+                (
+                    "score",
+                    models.PositiveSmallIntegerField(
+                        default=1,
+                        error_messages={"validators": "От одного до десяти!"},
+                        validators=[
+                            django.core.validators.MinValueValidator(1),
+                            django.core.validators.MaxValueValidator(10),
+                        ],
+                        verbose_name="Оценка",
+                    ),
+                ),
+                (
+                    "pub_date",
+                    models.DateTimeField(
+                        auto_now_add=True,
+                        db_index=True,
+                        verbose_name="Дата публикации",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Обзор',
-                'ordering': ['-pub_date'],
+                "verbose_name": "Обзор",
+                "ordering": ["-pub_date"],
             },
         ),
         migrations.CreateModel(
-            name='Title',
+            name="Title",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=64)),
-                ('year', models.PositiveSmallIntegerField(verbose_name='Год выхода')),
-                ('description', models.TextField(blank=True, null=True, verbose_name='Описание')),
-                ('category', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='reviews.Category')),
-                ('genre', models.ManyToManyField(related_name='titles', through='reviews.GenreTitle', to='reviews.Genre')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                (
+                    "year",
+                    models.PositiveSmallIntegerField(
+                        verbose_name="Год выхода"
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        blank=True, null=True, verbose_name="Описание"
+                    ),
+                ),
+                (
+                    "category",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="reviews.Category",
+                    ),
+                ),
+                (
+                    "genre",
+                    models.ManyToManyField(
+                        related_name="titles",
+                        through="reviews.GenreTitle",
+                        to="reviews.Genre",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'Название',
-                'ordering': ['name'],
+                "verbose_name": "Название",
+                "ordering": ["name"],
             },
         ),
     ]
