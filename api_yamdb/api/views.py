@@ -125,28 +125,27 @@ class TitlesViewSet(viewsets.ModelViewSet):
 def signup(request):
     """Принимает почту и юзернейм, в ответ отправляет код подтверждения."""
     serializer = SignupSerializer(data=request.data)
-    if serializer.is_valid():
-        user = User.objects.create(
-            email=serializer.validated_data["email"],
-            username=serializer.validated_data["username"],
-        )
+    serializer.is_valid(raise_exception=True)
+    user = User.objects.create(
+        email=serializer.validated_data["email"],
+        username=serializer.validated_data["username"],
+    )
 
-        confirmation_code = default_token_generator.make_token(user)
-        confirmation_code_hashed = make_password(
-            confirmation_code, salt="well"
-        )
+    confirmation_code = default_token_generator.make_token(user)
+    confirmation_code_hashed = make_password(
+        confirmation_code, salt="well"
+    )
 
-        user.confirmation_code = confirmation_code_hashed
-        user.save()
+    user.confirmation_code = confirmation_code_hashed
+    user.save()
 
-        send_mail(
-            "Код подтверждения",
-            f"{user.username}, код: {confirmation_code} /api/v1/auth/token/",
-            DOMAIN_NAME,
-            [f"{user.email}"],
-        )
-        return Response(serializer.data)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    send_mail(
+        "Код подтверждения",
+        f"{user.username}, код: {confirmation_code} /api/v1/auth/token/",
+        DOMAIN_NAME,
+        [f"{user.email}"],
+    )
+    return Response(serializer.data)
 
 
 @api_view(["POST"])
@@ -157,16 +156,14 @@ def get_token(request):
     В ответ отправляет токен.
     """
     serializer = TokenSerializer(data=request.data)
-    if serializer.is_valid():
-        username = serializer.data["username"]
-        user = get_object_or_404(User, username=username)
-        c_code = serializer.validated_data["confirmation_code"]
-        if check_password(c_code, user.confirmation_code):
-            refresh = RefreshToken.for_user(user)
-            return Response({"access": str(refresh.access_token)})
-        raise ValidationError(f"Неверный код подтверждения: {c_code}!")
-
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    serializer.is_valid(raise_exception=True)
+    username = serializer.data["username"]
+    user = get_object_or_404(User, username=username)
+    c_code = serializer.validated_data["confirmation_code"]
+    if check_password(c_code, user.confirmation_code):
+        refresh = RefreshToken.for_user(user)
+        return Response({"access": str(refresh.access_token)})
+    raise ValidationError(f"Неверный код подтверждения: {c_code}!")
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -196,10 +193,8 @@ class UserViewSet(viewsets.ModelViewSet):
             serializer = AdminSerializer(
                 request.user, data=request.data, partial=True
             )
-            if not serializer.is_valid():
-                return Response(
-                    serializer.data, status=status.HTTP_400_BAD_REQUEST
-                )
+            serializer.is_valid(raise_exception=True)
+
             role_user = request.user.role
             if role_user == "moderator" or role_user == "user":
                 serializer.validated_data["role"] = role_user
